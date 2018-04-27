@@ -21,7 +21,16 @@ router.get('/douban', async (ctx, next) => {
   await fetchUrl(targetUrlList, 3, rawResultList)
 
   console.log(rawResultList[0])
-  ctx.body = res.data;
+
+  contentList = rawResultList.map(stripContent)
+  console.log(contentList)
+
+  // ctx.body = res.data;
+  ctx.body = `<html>
+  <body>
+  <div>${contentList.join('')}</div>
+  </body>
+  </html>`
 })
 
 
@@ -44,6 +53,20 @@ async function fetchUrl(list, count, rawResultList) {
     return Promise.resolve()
   }
 
+}
+
+function stripContent(html){
+  let $ = cheerio.load(html)
+  let content = ''
+  try {
+    
+     content = $('#link-report').html().replace(/<\/?[^>]+(>|$)/g, "")
+    // content = html.replace(/<\/?[^>]+(>|$)/g, "")
+  }
+  catch(e){
+    console.log('strip error')
+  }
+  return content
 }
 
 module.exports = router;
