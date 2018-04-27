@@ -9,7 +9,9 @@
   "author": "Derycktse",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
-    "koa": "^2.3.0"
+    "koa": "^2.3.0",
+    "koa-router": "^7.4.0"
   }
 }
