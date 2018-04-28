@@ -6,10 +6,30 @@ const router = new Router()
 
 const DOUBAN_URL = 'https://www.douban.com/'
 
+const instance = axios.create({
+  baseURL: DOUBAN_URL,
+  timeout: 60000,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36',
+    'Referer' : 'https://www.douban.com/group/shenzhen/',
+    'Connection' : 'keep-alive',
+    'Pragma' : 'no-cache',
+    'Cache-Control' : 'no-cache',
+    'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding' : 'gzip, deflate, br',
+    'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+    'Cookie' : 'll="118282"; bid=7z57_X3aaME; _pk_ses.100001.8cb4=*; __utma=30149280.884327805.1524932197.1524932197.1524932197.1; __utmc=30149280; __utmz=30149280.1524932197.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; ps=y; ck=2NOd; __utmt=1; push_noty_num=0; push_doumail_num=0; ap=1; _ga=GA1.2.884327805.1524932197; _gid=GA1.2.376286299.1524933837; __yadk_uid=Z5Bk9MmBmlmrE795aeWbRVC4UmRMHMzr; _pk_id.100001.8cb4=2fa688e9bded6cd0.1524932196.1.1524933864.1524932196.; __utmb=30149280.37.4.1524933864107' 
+  }
+});
+
 
 router.get('/douban/group/:groupname', async (ctx, next) => {
   let rawResultList = []
-  const res = await axios.get(`${DOUBAN_URL}group/${ctx.params.groupname}/discussion?start=0`)
+  // const res = await axios.get(`${DOUBAN_URL}group/${ctx.params.groupname}/discussion?start=0`)
+
+  const res = await instance.get(`/group/${ctx.params.groupname}/discussion?start=0`, {
+
+  })
   const $ = cheerio.load(res.data)
 
 
@@ -55,7 +75,7 @@ async function fetchUrl(list, count, rawResultList) {
   if (!subList.length) return
 
   const pmArr = subList.map((url) => {
-    return axios.get(url)
+    return instance.get(url)
   })
 
   const resList = await Promise.all(pmArr);
@@ -88,11 +108,12 @@ function stripContent(rawItem) {
     item.url = rawItem.url
     item["title"] = $('h1').text().trim()
     item.content = $('#link-report').html().replace(/<\/?[^>]+(>|$)/g, "").trim()
+    item.author = $('.from a').text()
   }
   catch (e) {
     console.log('strip error')
   }
-  return item 
+  return item
 }
 
 
@@ -120,12 +141,12 @@ function rssFactory(feedOptions) {
 
   feedOptions.itemList.forEach(item => {
     feed.item({
-      title: item.title,
+      title: `${item.title}  from ${item.author}`,
       description: item.content,
       url: item.url, // link to the item
       // guid: '1123', // optional - defaults to url
       // categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4'], // optional - array of item categories
-      // author: 'Guest Author', // optional - defaults to feed author property
+      author: item.author, // optional - defaults to feed author property
       // date: 'May 27, 2012', // any format that js Date can parse.
       // lat: 33.417974, //optional latitude field for GeoRSS
       // long: -111.933231, //optional longitude field for GeoRSS
