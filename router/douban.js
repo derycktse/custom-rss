@@ -32,14 +32,16 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   // 处理内容
   contentList = rawResultList.map(stripContent)
-  console.log(contentList)
+  // console.log(contentList)
+
+  feedOptions.itemList = contentList || []
+
+  // rss处理
+  const feed = rssFactory(feedOptions)
 
   // ctx.body = res.data;
-  ctx.body = `<html>
-  <body>
-  <div>${contentList.join('')}</div>
-  </body>
-  </html>`
+  var xml = feed.xml()
+  ctx.body = xml
 })
 
 
@@ -85,12 +87,12 @@ function stripContent(rawItem) {
   try {
     item.url = rawItem.url
     item["title"] = $('h1').text().trim()
-    content = $('#link-report').html().replace(/<\/?[^>]+(>|$)/g, "")
+    item.content = $('#link-report').html().replace(/<\/?[^>]+(>|$)/g, "").trim()
   }
   catch (e) {
     console.log('strip error')
   }
-  return content
+  return item 
 }
 
 
@@ -105,7 +107,7 @@ function rssFactory(feedOptions) {
     managingEditor: 'derycktse',
     webMaster: 'derycktse',
     copyright: 'derycktse',
-    language: 'en',
+    language: 'zh-cn',
     // categories: ['Category 1', 'Category 2', 'Category 3'],
     pubDate: 'April 28, 2018 04:00:00 GMT',
     // ttl: '60',
@@ -114,30 +116,36 @@ function rssFactory(feedOptions) {
     },
   });
 
-  feed.item({
-    title: 'item title',
-    description: 'use this for the content. It can include html.',
-    url: 'http://example.com/article4?this&that', // link to the item
-    // guid: '1123', // optional - defaults to url
-    categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4'], // optional - array of item categories
-    // author: 'Guest Author', // optional - defaults to feed author property
-    date: 'May 27, 2012', // any format that js Date can parse.
-    lat: 33.417974, //optional latitude field for GeoRSS
-    long: -111.933231, //optional longitude field for GeoRSS
-    enclosure: { url: '...', file: 'path-to-file' }, // optional enclosure
-    custom_elements: [
-      { 'itunes:author': 'John Doe' },
-      { 'itunes:subtitle': 'A short primer on table spices' },
-      {
-        'itunes:image': {
-          _attr: {
-            href: 'http://example.com/podcasts/everything/AllAboutEverything/Episode1.jpg'
-          }
-        }
-      },
-      { 'itunes:duration': '7:04' }
-    ]
-  });
+  console.log(feedOptions)
+
+  feedOptions.itemList.forEach(item => {
+    feed.item({
+      title: item.title,
+      description: item.content,
+      url: item.url, // link to the item
+      // guid: '1123', // optional - defaults to url
+      // categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4'], // optional - array of item categories
+      // author: 'Guest Author', // optional - defaults to feed author property
+      // date: 'May 27, 2012', // any format that js Date can parse.
+      // lat: 33.417974, //optional latitude field for GeoRSS
+      // long: -111.933231, //optional longitude field for GeoRSS
+      // enclosure: { url: '...', file: 'path-to-file' }, // optional enclosure
+      // custom_elements: [
+      //   { 'itunes:author': 'John Doe' },
+      //   { 'itunes:subtitle': 'A short primer on table spices' },
+      //   {
+      //     'itunes:image': {
+      //       _attr: {
+      //         href: 'http://example.com/podcasts/everything/AllAboutEverything/Episode1.jpg'
+      //       }
+      //     }
+      //   },
+      //   { 'itunes:duration': '7:04' }
+      // ]
+    });
+  })
+
+  return feed
 }
 
 
