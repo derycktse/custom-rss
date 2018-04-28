@@ -11,14 +11,14 @@ const instance = axios.create({
   timeout: 60000,
   headers: {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36',
-    'Referer': 'https://www.douban.com/group/shenzhen/',
-    'Connection': 'keep-alive',
-    'Pragma': 'no-cache',
-    'Cache-Control': 'no-cache',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
-    'Cookie': 'll="118282"; bid=7z57_X3aaME; _pk_ses.100001.8cb4=*; __utma=30149280.884327805.1524932197.1524932197.1524932197.1; __utmc=30149280; __utmz=30149280.1524932197.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; ps=y; ck=2NOd; __utmt=1; push_noty_num=0; push_doumail_num=0; ap=1; _ga=GA1.2.884327805.1524932197; _gid=GA1.2.376286299.1524933837; __yadk_uid=Z5Bk9MmBmlmrE795aeWbRVC4UmRMHMzr; _pk_id.100001.8cb4=2fa688e9bded6cd0.1524932196.1.1524933864.1524932196.; __utmb=30149280.37.4.1524933864107'
+    'Referer' : 'https://www.douban.com/group/shenzhen/',
+    'Connection' : 'keep-alive',
+    'Pragma' : 'no-cache',
+    'Cache-Control' : 'no-cache',
+    'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding' : 'gzip, deflate, br',
+    'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+    'Cookie' : 'll="118282"; bid=7z57_X3aaME; _pk_ses.100001.8cb4=*; __utma=30149280.884327805.1524932197.1524932197.1524932197.1; __utmc=30149280; __utmz=30149280.1524932197.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; ps=y; dbcl2="150682313:y1ehuk/xP30"; ck=2NOd; push_noty_num=0; push_doumail_num=0; ap=1; _ga=GA1.2.884327805.1524932197; _gid=GA1.2.376286299.1524933837; __yadk_uid=Z5Bk9MmBmlmrE795aeWbRVC4UmRMHMzr; __utmt=1; _pk_id.100001.8cb4=2fa688e9bded6cd0.1524932196.1.1524935206.1524932196.; __utmb=30149280.62.4.1524935206282' 
   }
 });
 
@@ -38,15 +38,15 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   const resPage2 = await instance.get(`/group/${ctx.params.groupname}/discussion?start=25`, {
   })
-  const $ = cheerio.load(resPage2.data)
+  const $2 = cheerio.load(resPage2.data)
 
   // 获取列表里的文章链接
-  let targetUrlList2 = $('#content td.title a').map((idx, item) => {
+  let targetUrlList2 = $2('#content td.title a').map((idx, item) => {
     return item.attribs.href;
   })
 
-  // 合并两页
-  targetUrlList.push(...targetUrlList2)
+  // 合并两页, 数据，注： 结果是指一个类数组对象，所以要将它们转换成数组先
+  targetUrlList = Array.prototype.slice.call(targetUrlList2).concat( Array.prototype.slice.call(targetUrlList2))
 
   // 获取小组的标题
   const urlTitle = $('title').text().trim();
