@@ -16,7 +16,7 @@ const instance = axios.create({
     'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'Cookie': 'as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; bid=em1YZSE1l78; ps=y; ll="118282"; _pk_ses.100001.8cb4=*; __utma=30149280.2013164407.1524973381.1524973381.1524973381.1; __utmc=30149280; __utmz=30149280.1524973381.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmt=1; dbcl2="150682313:JAY4LTIvDP0"; ck=7vu4; push_noty_num=0; push_doumail_num=0; __yadk_uid=2G6jLJfJrREgWZtWjqFjMwR8dsAJzUpr; _pk_id.100001.8cb4=5a6987c1ab761b91.1524973380.1.1524973570.1524973380.; __utmb=30149280.31.0.1524973570253',
+    'Cookie': 'as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; bid=em1YZSE1l78; ps=y; ll="118282"; __utmc=30149280; __utmz=30149280.1524973381.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); ck=7vu4; push_noty_num=0; push_doumail_num=0; __yadk_uid=2G6jLJfJrREgWZtWjqFjMwR8dsAJzUpr; _pk_ses.100001.8cb4=*; __utma=30149280.2013164407.1524973381.1524973381.1525014505.2; __utmt=1; _pk_id.100001.8cb4=5a6987c1ab761b91.1524973380.2.1525014524.1524973576.; __utmb=30149280.16.4.1525014527125',
     'Host': 'www.douban.com',
     'Referer': 'https://www.douban.com/group/shenzhen/',
     'Pragma': 'no-cache',
@@ -56,6 +56,8 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   //test code
   // targetUrlList = [targetUrlList[0], targetUrlList[1], targetUrlList[2]]
+
+  console.log(`共获取${targetUrlList.length}条链接`)
   
   // 获取小组的标题
   const urlTitle = $('title').text().trim();
