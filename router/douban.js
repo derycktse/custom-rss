@@ -3,6 +3,7 @@ const axios = require('axios')
 const cheerio = require('cheerio');
 const RSS = require('rss');
 const router = new Router()
+const prettifyXml = require('prettify-xml')
 
 const DOUBAN_URL = 'https://www.douban.com/'
 
@@ -10,15 +11,17 @@ const instance = axios.create({
   baseURL: DOUBAN_URL,
   timeout: 60000,
   headers: {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Cookie': 'as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; bid=em1YZSE1l78; ps=y; ll="118282"; _pk_ses.100001.8cb4=*; __utma=30149280.2013164407.1524973381.1524973381.1524973381.1; __utmc=30149280; __utmz=30149280.1524973381.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmt=1; dbcl2="150682313:JAY4LTIvDP0"; ck=7vu4; push_noty_num=0; push_doumail_num=0; __yadk_uid=2G6jLJfJrREgWZtWjqFjMwR8dsAJzUpr; _pk_id.100001.8cb4=5a6987c1ab761b91.1524973380.1.1524973570.1524973380.; __utmb=30149280.31.0.1524973570253',
+    'Host': 'www.douban.com',
+    'Referer': 'https://www.douban.com/group/shenzhen/',
+    'Pragma': 'no-cache',
+    'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36',
-    'Referer' : 'https://www.douban.com/group/shenzhen/',
-    'Connection' : 'keep-alive',
-    'Pragma' : 'no-cache',
-    'Cache-Control' : 'no-cache',
-    'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Encoding' : 'gzip, deflate, br',
-    'Accept-Language' : 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
-    'Cookie' : 'll="118282"; bid=7z57_X3aaME; _pk_ses.100001.8cb4=*; __utma=30149280.884327805.1524932197.1524932197.1524932197.1; __utmc=30149280; __utmz=30149280.1524932197.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; ps=y; dbcl2="150682313:y1ehuk/xP30"; ck=2NOd; push_noty_num=0; push_doumail_num=0; ap=1; _ga=GA1.2.884327805.1524932197; _gid=GA1.2.376286299.1524933837; __yadk_uid=Z5Bk9MmBmlmrE795aeWbRVC4UmRMHMzr; __utmt=1; _pk_id.100001.8cb4=2fa688e9bded6cd0.1524932196.1.1524935206.1524932196.; __utmb=30149280.62.4.1524935206282' 
   }
 });
 
@@ -46,8 +49,11 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
   })
 
   // 合并两页, 数据，注： 结果是指一个类数组对象，所以要将它们转换成数组先
-  targetUrlList = Array.prototype.slice.call(targetUrlList2).concat( Array.prototype.slice.call(targetUrlList2))
+  targetUrlList = Array.prototype.slice.call(targetUrlList2).concat(Array.prototype.slice.call(targetUrlList2))
 
+  //test code
+  // targetUrlList = [targetUrlList[0], targetUrlList[1], targetUrlList[2]]
+  
   // 获取小组的标题
   const urlTitle = $('title').text().trim();
 
@@ -70,7 +76,8 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   // ctx.body = res.data;
   var xml = feed.xml()
-  ctx.body = xml
+  // ctx.body = xml
+  ctx.body = prettifyXml(injectRss(xml), { indent: 2, newline: '\n' })
 })
 
 
@@ -116,7 +123,7 @@ function stripContent(rawItem) {
   try {
     item.url = rawItem.url
     item["title"] = $('h1').text().trim()
-    item.content = $('#link-report').html().replace(/<\/?[^>]+(>|$)/g, "").trim()
+    item.content = $('.article').html() //.replace(/<\/?[^>]+(>|$)/g, "").trim()
     item.author = $('.from a').text()
   }
   catch (e) {
@@ -146,7 +153,6 @@ function rssFactory(feedOptions) {
     },
   });
 
-  console.log(feedOptions)
 
   feedOptions.itemList.forEach(item => {
     feed.item({
@@ -174,9 +180,19 @@ function rssFactory(feedOptions) {
       // ]
     });
   })
-
   return feed
 }
 
+
+// rss injecter 嵌入css样式
+function injectRss(xml) {
+  // return xml
+  const styleString = `<?xml-stylesheet type="text/css" href="https://img3.doubanio.com/f/shire/bf61b1fa02f564a4a8f809da7c7179b883a56146/css/douban.css" ?>
+   <?xml-stylesheet type="text/css" href="https://img3.doubanio.com/misc/mixed_static/5a5aaf5c9acac09c.css" ?>
+   <?xml-stylesheet type="text/css" href="https://img3.doubanio.com/f/group/2f4c6f83940e2bbb76f5a23a7d987b9093919799/css/group/init.css" ?>`
+  const target = '<?xml version="1.0" encoding="UTF-8"?>'
+
+  return xml.replace(target, target + styleString);
+}
 
 module.exports = router;
