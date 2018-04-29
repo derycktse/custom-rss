@@ -123,7 +123,7 @@ function stripContent(rawItem) {
   try {
     item.url = rawItem.url
     item["title"] = $('h1').text().trim()
-    item.content = $('.article').html() //.replace(/<\/?[^>]+(>|$)/g, "").trim()
+    item.content = $('.topic-content.clearfix').html() //.replace(/<\/?[^>]+(>|$)/g, "").trim()
     item.author = $('.from a').text()
   }
   catch (e) {
