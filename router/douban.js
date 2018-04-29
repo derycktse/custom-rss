@@ -9,7 +9,7 @@ const DOUBAN_URL = 'https://www.douban.com/'
 
 const instance = axios.create({
   baseURL: DOUBAN_URL,
-  timeout: 60000,
+  timeout: 300000,
   headers: {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, br',
@@ -32,6 +32,7 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
   // 获取第一页列表
   const resPage1 = await instance.get(`/group/${ctx.params.groupname}/discussion?start=0`, {
   })
+  console.log('获取第一页成功')
   const $ = cheerio.load(resPage1.data)
 
   // 获取列表里的文章链接
@@ -41,6 +42,8 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   const resPage2 = await instance.get(`/group/${ctx.params.groupname}/discussion?start=25`, {
   })
+
+  console.log('获取第二页成功')
   const $2 = cheerio.load(resPage2.data)
 
   // 获取列表里的文章链接
