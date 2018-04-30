@@ -58,7 +58,7 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
   // targetUrlList = [targetUrlList[0], targetUrlList[1], targetUrlList[2]]
 
   console.log(`共获取${targetUrlList.length}条链接`)
-  
+
   // 获取小组的标题
   const urlTitle = $('title').text().trim();
 
@@ -82,7 +82,7 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
   // ctx.body = res.data;
   var xml = feed.xml()
   // ctx.body = xml
-  ctx.body = prettifyXml(injectRss(xml), { indent: 2, newline: '\n' })
+  ctx.body = prettifyXml(xml, { indent: 2, newline: '\n' });
 })
 
 
