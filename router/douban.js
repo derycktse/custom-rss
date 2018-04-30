@@ -16,7 +16,7 @@ const instance = axios.create({
     'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh-TW;q=0.7,zh;q=0.6',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'Cookie': 'as="https://sec.douban.com/b?r=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F"; bid=em1YZSE1l78; ps=y; ll="118282"; __utmc=30149280; __utmz=30149280.1524973381.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); dbcl2="150682313:JAY4LTIvDP0"; ck=7vu4; push_noty_num=0; push_doumail_num=0; __yadk_uid=2G6jLJfJrREgWZtWjqFjMwR8dsAJzUpr; _pk_ses.100001.8cb4=*; __utma=30149280.2013164407.1524973381.1524973381.1525014505.2; __utmt=1; __utmb=30149280.30.4.1525014809064; _pk_id.100001.8cb4=5a6987c1ab761b91.1524973380.2.1525014873.1524973576.',
+    'Cookie': 'll="118282"; bid=4Gf_sB8zu44; _pk_ses.100001.8cb4=*; __utma=30149280.1719788265.1525086046.1525086046.1525086046.1; __utmc=30149280; __utmz=30149280.1525086046.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __utmt=1; __yadk_uid=SMCwuSUOeEGOryhuffAyxcyFUtBT5SKC; as="https://www.douban.com/group/shenzhen/"; ps=y; dbcl2="150682313:JAY4LTIvDP0"; ck=7vu4; _pk_id.100001.8cb4=ec5e010dbdb3c3be.1525086045.1.1525086077.1525086045.; push_noty_num=0; push_doumail_num=0; __utmb=30149280.13.5.1525086077452',
     'Host': 'www.douban.com',
     // 'Referer': 'https://www.douban.com/misc/sorry?original-url=https%3A%2F%2Fwww.douban.com%2Fgroup%2Fshenzhen%2F',
     'Pragma': 'no-cache',
@@ -53,6 +53,10 @@ router.get('/douban/group/:groupname', async (ctx, next) => {
 
   // 合并两页, 数据，注： 结果是指一个类数组对象，所以要将它们转换成数组先
   targetUrlList = Array.prototype.slice.call(targetUrlList2).concat(Array.prototype.slice.call(targetUrlList2))
+
+
+  // 一次获取30条吧
+  targetUrlList.slice(0, 30)
 
   //test code
   // targetUrlList = [targetUrlList[0], targetUrlList[1], targetUrlList[2]]
